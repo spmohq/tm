@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>15-Tweet Library + DM Triggers — Copy Tool</title>
+<style>
+  :root{
+    --bg:#f7fafc; --card:#fff; --muted:#64748b; --accent:#0ea5a4; --accent-dark:#036b6b;
+  }
+  body{font-family:system-ui,Segoe UI,Roboto,Arial;max-width:1100px;margin:18px auto;padding:18px;color:#0f172a;background:var(--bg)}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  h1{margin:0;font-size:20px}
+  p.lead{margin:6px 0 12px;color:var(--muted)}
+  .search{margin:12px 0}
+  input[type=search]{width:100%;padding:10px;border-radius:8px;border:1px solid #d1e7e6}
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:16px}
+  .left{min-width:0}
+  .right{position:sticky;top:20px}
+  .category{margin:12px 0;padding:14px;border-radius:10px;background:var(--card);border:1px solid #e6eef0}
+  .orig{padding:10px;border-radius:8px;border-bottom:1px solid #f0f4f5;margin-bottom:8px}
+  .meta{font-size:12px;color:var(--muted);margin-bottom:6px}
+  .tweet-box{background:#fcfeff;padding:10px;border-radius:6px;border:1px solid #eef6f6;white-space:pre-wrap}
+  .remix{margin-top:8px;padding:8px;border-left:3px solid var(--accent);background:#fbfffe;border-radius:6px}
+  .controls{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  button.copy{background:var(--accent);color:#fff;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+  button.copy.small{background:var(--accent-dark)}
+  .note{font-size:12px;color:var(--muted)}
+  .dm-box{margin-top:10px;padding:10px;border-radius:8px;background:#f8fffe;border:1px dashed #cdeeea}
+  .dm-meta{font-size:13px;color:#0b605f;margin-bottom:6px}
+  .panel{padding:12px;border-radius:10px;background:var(--card);border:1px solid #e6eef0}
+  .panel h3{margin:0 0 8px 0}
+  .trigger{font-size:13px;margin:6px 0;padding:8px;border-radius:8px;background:#fbfffe;border-left:4px solid #e6f6f5}
+  .small{font-size:13px;color:var(--muted)}
+  .kbd{background:#e6f6f5;padding:4px 6px;border-radius:6px;font-size:12px;color:#065a57}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} .right{position:static} }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>15-Tweet Library + DM Triggers</h1>
+    <p class="lead">Post manually. Watch for triggers. Use the DM copy buttons to reply personally. This keeps your funnel human-first and spam-proof.</p>
+  </div>
+  <div class="small"><strong>Manual Workflow:</strong> Post → Engage → Wait for trigger → Send DM</div>
+</header>
+
+<div class="search"><input id="q" type="search" placeholder="Search tweets, tags, or triggers (e.g. 'clarity', 'Funnel', 'bookmark')" /></div>
+
+<div class="grid">
+  <main class="left" id="container"></main>
+
+  <aside class="right">
+    <div class="panel">
+      <h3>DM Trigger Guide</h3>
+      <p class="small">Use these signals to decide WHEN to DM. Never DM cold — wait for 1+ strong signal.</p>
+      <div class="trigger"><strong>Like x2+ quickly</strong><div class="small">Likely profile visit. <span class="kbd">Action:</span> Wait 10-60 mins, then send Warm Opener.</div></div>
+      <div class="trigger"><strong>Follow after engagement</strong><div class="small">High intent. <span class="kbd">Action:</span> Send Warm Opener within 2 hours.</div></div>
+      <div class="trigger"><strong>Replies with pain</strong><div class="small">Hot lead. <span class="kbd">Action:</span> DM Deep-Pain question immediately.</div></div>
+      <div class="trigger"><strong>Bookmarks / Saves</strong><div class="small">Quiet interest — watch for another signal; follow up with value after 1 day.</div></div>
+      <div class="trigger"><strong>Multiple engagements over 48h</strong><div class="small">Very warm. <span class="kbd">Action:</span> DM qualification + permission offer.</div></div>
+      <hr />
+      <h3 style="margin-top:8px">Timing Rules</h3>
+      <ul class="small">
+        <li><strong>Warm Opener:</strong> within 2 hours of trigger.</li>
+        <li><strong>Qualification:</strong> after they reply to the opener same day.</li>
+        <li><strong>Permission Offer:</strong> only after pain is clear.</li>
+        <li><strong>Ghost follow-up:</strong> 24–48 hours after no reply.</li>
+      </ul>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="panel">
+      <h3>DM Script Quick-Reference</h3>
+      <div class="small">Click <span class="kbd">Copy DM</span> next to any tweet to copy a tailored DM for the recommended trigger.</div>
+      <hr />
+      <div style="margin-top:8px">
+        <strong class="small">Warm Opener</strong>
+        <div class="small">“Hey! Appreciate you engaging earlier — curious, what’s your current setup for your Twitter content workflow?”</div>
+      </div>
+      <div style="margin-top:8px">
+        <strong class="small">Deep-Pain</strong>
+        <div class="small">“What slows you down the most when it comes to creating content consistently?”</div>
+      </div>
+      <div style="margin-top:8px">
+        <strong class="small">Permission Offer</strong>
+        <div class="small">“I actually built a super simple version of what you’re trying to do. Want me to send it over?”</div>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="panel">
+      <h3>Quick Tips</h3>
+      <ul class="small">
+        <li>Prefer short DMs. Ask one question. Diagnose.</li>
+        <li>Log every DM in your CRM sheet after sending.</li>
+        <li>Use the first comment to place less-important hashtags or links.</li>
+        <li>Respect "no" — don't chase buyers. Nurture instead.</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<script>
+// === Data ===
+// Base tweets
+const baseTweets = [
+{"id":"B01","category":"Awareness","text":"Most creators don’t fail because of bad ideas. They fail because they’re overwhelmed.","type":"base"},
+{"id":"B02","category":"Awareness","text":"Content isn’t hard. Chaos is.","type":"base"},
+{"id":"B03","category":"Awareness","text":"You don’t need more strategies — you need fewer decisions.","type":"base"},
+{"id":"B04","category":"Value","text":"If your content feels inconsistent, it’s because your workflow is inconsistent.","type":"base"},
+{"id":"B05","category":"Value","text":"Clarity → Consistency → Results. Most creators try to skip to step 3.","type":"base"},
+{"id":"B06","category":"Value","text":"Batching 3 hooks today removes 50% of tomorrow’s anxiety.","type":"base"},
+{"id":"B07","category":"Story","text":"I used to drown in tools until I built a 5-step system that removed decision fatigue.","type":"base"},
+{"id":"B08","category":"Story","text":"My turning point wasn’t motivation — it was workflow clarity.","type":"base"},
+{"id":"B09","category":"Story","text":"Once I stopped chasing tactics, everything got easier.","type":"base"},
+{"id":"B10","category":"Authority","text":"Most creators don’t need more ideas — they need a repeatable system.","type":"base"},
+{"id":"B11","category":"Authority","text":"Your workflow matters more than your niche.","type":"base"},
+{"id":"B12","category":"Authority","text":"If your system is simple, your audience grows faster.","type":"base"},
+{"id":"B13","category":"SoftCTA","text":"Want my simple clarity system for beginners? DM “Funnel”.","type":"base"},
+{"id":"B14","category":"SoftCTA","text":"I turned chaos into clarity with a 7-step process. Want it?","type":"base"},
+{"id":"B15","category":"SoftCTA","text":"If content overwhelms you, I have something that helps. DM “Funnel”.","type":"base"}
+];
+
+// Remixes (same as before)
+const remixes = [
+{"id":"R01","orig_id":"B01","variant_type":"Short","remix_text":"They don’t lack ideas — they lack a system."},
+{"id":"R02","orig_id":"B01","variant_type":"Punchy","remix_text":"Overwhelm kills more creators than bad ideas."},
+{"id":"R03","orig_id":"B01","variant_type":"Story","remix_text":"I used to have 100 ideas and no system. One system fixed everything."},
+{"id":"R04","orig_id":"B01","variant_type":"Question","remix_text":"What would change if overwhelm disappeared from your process?"},
+{"id":"R05","orig_id":"B01","variant_type":"Contrarian","remix_text":"Ideas aren’t the problem. Systems are."},
+{"id":"R06","orig_id":"B02","variant_type":"Short","remix_text":"Chaos makes content hard, not creativity."},
+{"id":"R07","orig_id":"B02","variant_type":"Punchy","remix_text":"Your content problem = chaos."},
+{"id":"R08","orig_id":"B02","variant_type":"Story","remix_text":"When I removed chaos, posts flowed. Sales followed."},
+{"id":"R09","orig_id":"B02","variant_type":"Question","remix_text":"How much chaos is in your posting process?"},
+{"id":"R10","orig_id":"B02","variant_type":"Contrarian","remix_text":"If you want easier content, remove noise not add tools."},
+{"id":"R11","orig_id":"B03","variant_type":"Short","remix_text":"Fewer decisions > more strategies."},
+{"id":"R12","orig_id":"B03","variant_type":"Punchy","remix_text":"Stop adding strategy. Remove decisions."},
+{"id":"R13","orig_id":"B03","variant_type":"Story","remix_text":"I simplified choices and finally finished threads weekly."},
+{"id":"R14","orig_id":"B03","variant_type":"Question","remix_text":"Which decision drains you most each week?"},
+{"id":"R15","orig_id":"B03","variant_type":"Contrarian","remix_text":"Strategy without reduction is just busywork."},
+{"id":"R16","orig_id":"B04","variant_type":"Short","remix_text":"Inconsistent workflow = inconsistent posts."},
+{"id":"R17","orig_id":"B04","variant_type":"Punchy","remix_text":"Fix the workflow, fix the content."},
+{"id":"R18","orig_id":"B04","variant_type":"Story","remix_text":"Once I made a posting process, consistency arrived."},
+{"id":"R19","orig_id":"B04","variant_type":"Question","remix_text":"What’s the one step you skip most?"},
+{"id":"R20","orig_id":"B04","variant_type":"Contrarian","remix_text":"Consistency beats new tactics every time."},
+{"id":"R21","orig_id":"B05","variant_type":"Short","remix_text":"Clarity first, results later."},
+{"id":"R22","orig_id":"B05","variant_type":"Punchy","remix_text":"You can’t skip clarity and expect results."},
+{"id":"R23","orig_id":"B05","variant_type":"Story","remix_text":"Clarity changed my engagement in 2 weeks."},
+{"id":"R24","orig_id":"B05","variant_type":"Question","remix_text":"Can you describe your promise in one sentence?"},
+{"id":"R25","orig_id":"B05","variant_type":"Contrarian","remix_text":"Results follow clarity, not hustle."},
+{"id":"R26","orig_id":"B06","variant_type":"Short","remix_text":"Batch hooks—save time tomorrow."},
+{"id":"R27","orig_id":"B06","variant_type":"Punchy","remix_text":"Batch once. Publish many."},
+{"id":"R28","orig_id":"B06","variant_type":"Story","remix_text":"I started batching hooks and never stared at blank again."},
+{"id":"R29","orig_id":"B06","variant_type":"Question","remix_text":"When will you batch your next hooks?"},
+{"id":"R30","orig_id":"B06","variant_type":"Contrarian","remix_text":"Creativity isn’t spontaneous — it’s scheduled."},
+{"id":"R31","orig_id":"B07","variant_type":"Short","remix_text":"A 5-step system saved my sanity."},
+{"id":"R32","orig_id":"B07","variant_type":"Punchy","remix_text":"Tools didn’t help. A system did."},
+{"id":"R33","orig_id":"B07","variant_type":"Story","remix_text":"I dropped 10 tools and kept one workflow."},
+{"id":"R34","orig_id":"B07","variant_type":"Question","remix_text":"What’s one small system you could commit to?"},
+{"id":"R35","orig_id":"B07","variant_type":"Contrarian","remix_text":"You don’t need more tools to fix overwhelm."},
+{"id":"R36","orig_id":"B08","variant_type":"Short","remix_text":"Clarity beats motivation."},
+{"id":"R37","orig_id":"B08","variant_type":"Punchy","remix_text":"Motivation is temporary; systems last."},
+{"id":"R38","orig_id":"B08","variant_type":"Story","remix_text":"Clarity was the turning point for me."},
+{"id":"R39","orig_id":"B08","variant_type":"Question","remix_text":"What changed when you had clarity?"},
+{"id":"R40","orig_id":"B08","variant_type":"Contrarian","remix_text":"Motivation isn’t the lever — clarity is."},
+{"id":"R41","orig_id":"B09","variant_type":"Short","remix_text":"Stop chasing tactics; refine process."},
+{"id":"R42","orig_id":"B09","variant_type":"Punchy","remix_text":"Tactics distract from process."},
+{"id":"R43","orig_id":"B09","variant_type":"Story","remix_text":"Dropping tactics gave me freedom to create."},
+{"id":"R44","orig_id":"B09","variant_type":"Question","remix_text":"Which tactic have you been chasing lately?"},
+{"id":"R45","orig_id":"B09","variant_type":"Contrarian","remix_text":"Tactics are shortcuts that create long-term clutter."},
+{"id":"R46","orig_id":"B10","variant_type":"Short","remix_text":"Repeatable system > more ideas."},
+{"id":"R47","orig_id":"B10","variant_type":"Punchy","remix_text":"Systems amplify ideas."},
+{"id":"R48","orig_id":"B10","variant_type":"Story","remix_text":"A system made my best ideas repeatable."},
+{"id":"R49","orig_id":"B10","variant_type":"Question","remix_text":"Do you have a repeatable system?"},
+{"id":"R50","orig_id":"B10","variant_type":"Contrarian","remix_text":"You won’t scale with random ideas."},
+{"id":"R51","orig_id":"B11","variant_type":"Short","remix_text":"Workflow beats niche."},
+{"id":"R52","orig_id":"B11","variant_type":"Punchy","remix_text":"Niche matters less than your process."},
+{"id":"R53","orig_id":"B11","variant_type":"Story","remix_text":"I changed niche focus but kept my workflow; results stayed."},
+{"id":"R54","orig_id":"B11","variant_type":"Question","remix_text":"What part of your workflow needs fixing?"},
+{"id":"R55","orig_id":"B11","variant_type":"Contrarian","remix_text":"Niche is not the main bottleneck."},
+{"id":"R56","orig_id":"B12","variant_type":"Short","remix_text":"Simple systems grow audiences."},
+{"id":"R57","orig_id":"B12","variant_type":"Punchy","remix_text":"Simplicity scales."},
+{"id":"R58","orig_id":"B12","variant_type":"Story","remix_text":"Simple process = steady audience growth."},
+{"id":"R59","orig_id":"B12","variant_type":"Question","remix_text":"How simple is your system?"},
+{"id":"R60","orig_id":"B12","variant_type":"Contrarian","remix_text":"Complex systems stall growth."},
+{"id":"R61","orig_id":"B13","variant_type":"Short","remix_text":"DM “Funnel” for the starter checklist."},
+{"id":"R62","orig_id":"B13","variant_type":"Punchy","remix_text":"Want the beginner checklist? DM “Funnel”."},
+{"id":"R63","orig_id":"B13","variant_type":"Story","remix_text":"This checklist turned my weekend into 3 leads."},
+{"id":"R64","orig_id":"B13","variant_type":"Question","remix_text":"Want the checklist now? DM “Funnel”"},
+{"id":"R65","orig_id":"B13","variant_type":"Contrarian","remix_text":"You don’t need a big course — just a clear checklist."},
+{"id":"R66","orig_id":"B14","variant_type":"Short","remix_text":"DM “Funnel” for the 7-step process."},
+{"id":"R67","orig_id":"B14","variant_type":"Punchy","remix_text":"7-step clarity process → DM “Funnel”."},
+{"id":"R68","orig_id":"B14","variant_type":"Story","remix_text":"That 7-step process fixed my posting chaos."},
+{"id":"R69","orig_id":"B14","variant_type":"Question","remix_text":"Want the 7-step outline? DM “Funnel”"},
+{"id":"R70","orig_id":"B14","variant_type":"Contrarian","remix_text":"A short system beats a long course."},
+{"id":"R71","orig_id":"B15","variant_type":"Short","remix_text":"DM “Funnel” if overwhelmed."},
+{"id":"R72","orig_id":"B15","variant_type":"Punchy","remix_text":"Overwhelmed? DM “Funnel”."},
+{"id":"R73","orig_id":"B15","variant_type":"Story","remix_text":"People who DM “Funnel” get a simple plan."},
+{"id":"R74","orig_id":"B15","variant_type":"Question","remix_text":"DM “Funnel” to get the starter plan."},
+{"id":"R75","orig_id":"B15","variant_type":"Contrarian","remix_text":"Selling complexity won’t help — simple workflows will."}
+];
+
+// First-comment suggestions
+const firstComments = {
+  "B01":"Try this: write your one-sentence promise right now. That promise becomes your content anchor.",
+  "B02":"Small action: remove one tool this week. See what gets easier.",
+  "B03":"Exercise: list 3 daily decisions you can eliminate.",
+  "B04":"Mini-check: record your posting steps for one week — where do you stall?",
+  "B05":"Try writing your promise as a 7-word sentence. Use it every post this week.",
+  "B06":"Action: write 3 hooks tonight. Pick one to use tomorrow morning.",
+  "B07":"I created a 1-page 5-step checklist. DM 'Funnel' and I'll send it.",
+  "B08":"Clarity was the lever — what’s one tiny thing you can clarify today?",
+  "B09":"Small wins compound — pick one tiny habit to repeat for 7 days.",
+  "B10":"Do you have one repeatable system you use weekly? If not, start with a template.",
+  "B11":"Quick test: change one step in your workflow and see if stress drops.",
+  "B12":"Simplicity scales — what could you remove from your process this week?",
+  "B13":"DM 'Funnel' for a starter checklist that takes 10 minutes to use.",
+  "B14":"Want the 7-step outline? DM 'Funnel' and I’ll share the PDF.",
+  "B15":"Overwhelmed? DM 'Funnel' — I’ll send a one-page plan you can use today."
+};
+
+// DM scripts per trigger (tailored)
+const dmScripts = {
+  "warm_opener":"Hey! Appreciate you engaging earlier — curious, what’s your current setup for your Twitter content workflow?",
+  "qualification":"Are you posting with a system right now or mostly 'whenever I can'?",
+  "deep_pain":"What slows you down the most when it comes to creating content consistently?",
+  "permission_offer":"I actually built a super simple version of what you’re trying to do. Want me to send it over?",
+  "deliver_value":"Here you go — this takes a few minutes to understand and makes posting way easier. Let me know which part hits hardest.",
+  "ghost_follow_up":"Totally cool if you got busy — want the link?",
+  "hesitation_probe":"No worries — what’s the one thing you’d want this system to fix first?"
+};
+
+// Recommended triggers per base tweet (array of trigger keys)
+const recommendedTriggers = {
+  "B01":["like_multiple","reply_with_pain"],
+  "B02":["bookmark","like_multiple"],
+  "B03":["reply_with_pain","like_multiple"],
+  "B04":["reply_with_pain","bookmark"],
+  "B05":["like_multiple","follow_after_engagement"],
+  "B06":["reply_with_pain","like_multiple"],
+  "B07":["reply_with_pain","follow_after_engagement"],
+  "B08":["reply_with_pain","bookmark"],
+  "B09":["reply_with_pain","like_multiple"],
+  "B10":["follow_after_engagement","reply_with_pain"],
+  "B11":["reply_with_pain","like_multiple"],
+  "B12":["bookmark","follow_after_engagement"],
+  "B13":["dm_trigger","reply_with_pain"],
+  "B14":["dm_trigger","reply_with_pain"],
+  "B15":["dm_trigger","reply_with_pain"]
+};
+
+// Human-friendly trigger labels + guidance
+const triggerLabels = {
+  "like_multiple":"Like x2+ quickly — likely visited profile",
+  "follow_after_engagement":"Follow after engaging — high intent",
+  "reply_with_pain":"Reply expressing a pain or struggle — hot lead",
+  "bookmark":"Bookmark/save — quiet interest; watch for another signal",
+  "dm_trigger":"Direct DM trigger (user asks for system or says 'send')"
+};
+
+// === Render ===
+function render(){
+  const cont = document.getElementById('container');
+  cont.innerHTML='';
+  baseTweets.forEach(b=>{
+    const sec = document.createElement('div'); sec.className='category';
+    const h = document.createElement('h2'); h.innerText = b.id + ' • ' + b.category;
+    sec.appendChild(h);
+    const art = document.createElement('div'); art.className='orig';
+    art.innerHTML = `<div class="meta"><strong>ID:</strong> ${b.id} • <strong>Type:</strong> ${b.type}</div>
+      <div class="tweet-box" id="tweet-${b.id}">${b.text}</div>
+      <div class="controls">
+        <button class="copy" data-copy="#tweet-${b.id}">Copy Tweet</button>
+        <button class="copy small" data-first-only="${b.id}">Copy First Comment</button>
+        <button class="copy" data-copy="#tweet-${b.id}" data-first="${firstComments[b.id] || ''}">Copy + First Comment</button>
+      </div>
+      <div class="dm-box">
+        <div class="dm-meta"><strong>Recommended Triggers:</strong></div>
+        <div id="triggers-${b.id}" class="small"></div>
+        <div style="margin-top:8px">
+          <div class="small"><strong>Quick DM actions:</strong></div>
+          <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+            <button class="copy" data-dm="warm_opener" data-dmid="${b.id}">Copy DM — Warm Opener</button>
+            <button class="copy" data-dm="qualification" data-dmid="${b.id}">Copy DM — Qualify</button>
+            <button class="copy" data-dm="deep_pain" data-dmid="${b.id}">Copy DM — Deep Pain</button>
+            <button class="copy" data-dm="permission_offer" data-dmid="${b.id}">Copy DM — Permission Offer</button>
+          </div>
+          <div style="margin-top:8px" class="small">After sending any DM, log it in your CRM and update lead stage.</div>
+        </div>
+      </div>
+    `;
+    sec.appendChild(art);
+
+    // remixes
+    const remList = remixes.filter(r => r.orig_id === b.id);
+    remList.forEach(r => {
+      const rid = r.id;
+      const d = document.createElement('div'); d.className='remix';
+      d.innerHTML = `<strong>${r.variant_type}:</strong> <span id="${rid}">${r.remix_text}</span> <button class="copy" data-copy="#${rid}">Copy</button>`;
+      sec.appendChild(d);
+    });
+
+    cont.appendChild(sec);
+
+    // fill triggers list
+    const triggerDiv = document.getElementById(`triggers-${b.id}`);
+    const list = recommendedTriggers[b.id] || [];
+    triggerDiv.innerHTML = list.map(t => `<div style="margin-bottom:6px">${triggerLabels[t] || t}</div>`).join('');
+  });
+}
+
+// Copy / DM button logic
+document.addEventListener('click', e=>{
+  const btn = e.target.closest('button.copy');
+  if(!btn) return;
+
+  const firstOnlyKey = btn.getAttribute('data-first-only');
+  if(firstOnlyKey){
+    const text = firstComments[firstOnlyKey] || '';
+    copyToClipboard(text, btn);
+    return;
+  }
+
+  const dmKey = btn.getAttribute('data-dm');
+  if(dmKey){
+    // copy DM script - but personalize: include small context helper
+    const baseId = btn.getAttribute('data-dmid') || '';
+    let dmText = dmScripts[dmKey] || '';
+    // Add optional personalization hint
+    if(baseId){
+      dmText = dmText + " (Saw your engagement on " + baseId + " — curious to learn more.)";
+    }
+    copyToClipboard(dmText, btn);
+    return;
+  }
+
+  const sel = btn.getAttribute('data-copy');
+  let text = '';
+  if(sel){
+    const el = document.querySelector(sel);
+    if(el) text += el.innerText.trim();
+  }
+  const extra = btn.getAttribute('data-first');
+  if(extra) text = extra + "\n\n" + text;
+  copyToClipboard(text, btn);
+});
+
+// helper for clipboard with UI feedback
+function copyToClipboard(text, btn){
+  if(!text) {
+    const orig = btn.innerText;
+    btn.innerText = 'Empty';
+    setTimeout(()=> btn.innerText = orig, 900);
+    return;
+  }
+  navigator.clipboard.writeText(text).then(()=>{ 
+    const orig = btn.innerText;
+    btn.innerText='Copied';
+    setTimeout(()=> btn.innerText = orig,900);
+  }).catch(()=>{
+    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    const orig = btn.innerText;
+    btn.innerText='Copied';
+    setTimeout(()=> btn.innerText = orig,900);
+  });
+}
+
+// search filter
+document.getElementById('q').addEventListener('input', ()=>{
+  const v = document.getElementById('q').value.toLowerCase();
+  document.querySelectorAll('.category').forEach(s=>{
+    if(!v) { s.style.display=''; return; }
+    const txt = s.innerText.toLowerCase();
+    if(txt.includes(v)) s.style.display='';
+    else s.style.display='none';
+  });
+});
+
+render();
+</script>
+</body>
+</html>
