@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Comment Activity Manager — COCS</title>
+<style>
+  :root{--bg:#f8fafc;--card:#fff;--muted:#64748b;--accent:#0ea5a4;--accent-dark:#036b6b;}
+  body{font-family: system-ui,Segoe UI,Roboto,Arial; margin:16px auto; max-width:1200px; color:#0f172a; background:var(--bg); padding:18px;}
+  h1{margin:0 0 6px;font-size:20px}
+  p.lead{margin:6px 0 12px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:16px}
+  .left{min-width:0}
+  .right{position:sticky;top:20px}
+  .panel{background:var(--card);padding:12px;border-radius:10px;border:1px solid #e6eef0;margin-bottom:12px}
+  .search{display:flex;gap:8px;margin-bottom:10px}
+  input[type=search], input[type=text], textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid #d1e7e6}
+  .day-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .day-num{width:48px;padding:8px;border-radius:8px;background:#f1fdfa;border:1px solid #cdeeea;text-align:center}
+  .list{background:#ffffff;padding:10px;border-radius:8px;border:1px solid #eef6f6;margin-bottom:8px}
+  .list small{color:var(--muted)}
+  button.copy{background:var(--accent);color:#fff;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+  button.ghost{background:transparent;border:1px solid #e6eef0;padding:8px 10px;border-radius:8px;cursor:pointer}
+  .templates{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .template{background:#fcfffe;padding:10px;border-radius:8px;border-left:4px solid var(--accent);min-height:56px}
+  .small{font-size:13px;color:var(--muted)}
+  .modal{position:fixed;left:0;top:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;background:rgba(11,15,20,0.45);z-index:999}
+  .modal .card{width:780px;max-width:96%;background:var(--card);padding:14px;border-radius:10px;border:1px solid #e6eef0}
+  .flex{display:flex;gap:8px;align-items:center}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:6px;border-bottom:1px solid #eef6f6;text-align:left;font-size:13px}
+  .log-area{max-height:300px;overflow:auto}
+  @media(max-width:900px){ .grid{grid-template-columns:1fr} .right{position:static} .templates{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+  <h1>Comment Activity Manager — COCS</h1>
+  <p class="lead">Daily commenting system: find the right posts, leave high-contact comments, and track your outreach. Manual-first, nurture-smart. Save this file and open it each day.</p>
+
+  <div class="grid">
+    <main class="left">
+
+      <div class="panel">
+        <h3>How to use (quick)</h3>
+        <ol class="small">
+          <li>Pick today (Day 1–60) — open the day's checklist below.</li>
+          <li>Use the Basic Search Strings first; if not enough results, use the Secondary search strings.</li>
+          <li>Open a post, read it, then open a comment template and personalize it in the editor button.</li>
+          <li>Post the comment manually on Twitter/X. Then click <strong>Copy & Log Comment</strong> to store the action in local CRM.</li>
+          <li>Repeat until daily targets are met. Export logs weekly to your master CRM.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h3>Daily Checklist Generator (editable)</h3>
+        <p class="small">Default daily tasks (editable). These map to the checklist format you requested earlier.</p>
+
+        <div style="margin-top:8px">
+          <label class="small">Select Day:</label>
+          <select id="day-selector"></select>
+        </div>
+
+        <div id="day-content" style="margin-top:10px"></div>
+
+        <div style="margin-top:10px" class="small">Tip: Click any search string to copy it to clipboard, or edit before copying.</div>
+      </div>
+
+      <div class="panel">
+        <h3>Who to comment on (categories)</h3>
+
+        <div class="list">
+          <strong>1) Broad niche posts</strong>
+          <div class="small">High-reach posts in your topic (use for reach)</div>
+          <div style="margin-top:6px"><em>Basic search:</em> <button class="ghost" data-copytext="affiliate marketing">affiliate marketing</button> <button class="ghost" data-copytext="online business">online business</button></div>
+          <div style="margin-top:6px"><em>Secondary search (fallback):</em> <button class="ghost" data-copytext="digital marketing tips">digital marketing tips</button> <button class="ghost" data-copytext="email marketing">email marketing</button></div>
+        </div>
+
+        <div class="list">
+          <strong>2) Creators discussing overwhelm</strong>
+          <div class="small">High empathy comments convert to DMs</div>
+          <div style="margin-top:6px"><em>Basic search:</em> <button class="ghost" data-copytext="overwhelmed with marketing">overwhelmed with marketing</button> <button class="ghost" data-copytext="too many tools">too many tools</button></div>
+          <div style="margin-top:6px"><em>Secondary search:</em> <button class="ghost" data-copytext="marketing burnout">marketing burnout</button> <button class="ghost" data-copytext="content overwhelm">content overwhelm</button></div>
+        </div>
+
+        <div class="list">
+          <strong>3) AI-curious creators</strong>
+          <div class="small">Good for product interest & positioning</div>
+          <div style="margin-top:6px"><em>Basic search:</em> <button class="ghost" data-copytext="ChatGPT prompts?">ChatGPT prompts?</button> <button class="ghost" data-copytext="AI workflow help">AI workflow help</button></div>
+          <div style="margin-top:6px"><em>Secondary search:</em> <button class="ghost" data-copytext="ai for creators">ai for creators</button> <button class="ghost" data-copytext="ai content tools">ai content tools</button></div>
+        </div>
+
+        <div class="list">
+          <strong>4) Warm notifications</strong>
+          <div class="small">People who liked or replied more than once — high priority</div>
+          <div style="margin-top:6px"><em>Search / identification:</em> check notifications, likes, and repeat engagers on your recent tweets</div>
+        </div>
+
+        <div class="list">
+          <strong>5) New creators in your niche</strong>
+          <div class="small">Follow + thoughtful comment to build relationships</div>
+          <div style="margin-top:6px"><em>Basic search:</em> <button class="ghost" data-copytext="new creator affiliate marketing">new creator affiliate marketing</button> <button class="ghost" data-copytext="just starting content creator">just starting content creator</button></div>
+          <div style="margin-top:6px"><em>Secondary search:</em> <button class="ghost" data-copytext="first tweet thread help">first tweet thread help</button> <button class="ghost" data-copytext="starting out creators">starting out creators</button></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Comment Templates Library</h3>
+        <p class="small">Pick a template, click <em>Edit & Copy</em> to personalize then post.</p>
+        <div class="templates" id="templates-area"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Editable Comment Composer (modal)</h3>
+        <p class="small">When you click any template's "Edit & Copy" button, the modal opens with prefilled text. Personalize, then Copy & Log.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Comment Log</h3>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input id="log-target" type="text" placeholder="Optional: paste post URL or @handle before logging" />
+          <button id="view-log" class="copy">View Log</button>
+          <button id="export-log" class="copy">Export CSV</button>
+          <button id="clear-log" class="copy" style="background:#ef4444">Clear Log</button>
+        </div>
+        <div id="log-area" class="log-area" style="display:none"></div>
+        <div class="small" style="margin-top:8px">Logs are stored locally. Export weekly to your master sheet.</div>
+      </div>
+
+    </main>
+
+    <aside class="right">
+      <div class="panel">
+        <h3>Daily Targets (default)</h3>
+        <ul class="small">
+          <li>✔ Engage with 5 broad niche posts</li>
+          <li>✔ Engage with 5 creators discussing overwhelm</li>
+          <li>✔ Engage with 3 AI-curious creators</li>
+          <li>✔ Engage with 3 warm notifications (repeat engagers)</li>
+          <li>✔ Engage with 2 new accounts (follow + thoughtful comment)</li>
+        </ul>
+        <p class="small">Adjust targets per day in the day editor.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Search Strategy Tips</h3>
+        <ol class="small">
+          <li>Start with Basic search strings (higher volume).</li>
+          <li>If results low, use Secondary searches (long-tail).</li>
+          <li>Use quotes for exact-match searches and add filters like "from:" to narrow.</li>
+          <li>Prefer recent posts (last 24–72 hrs) for comments to be seen.</li>
+          <li>When in doubt, open profile first to confirm relevance.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h3>Quick Commenting Rules</h3>
+        <ul class="small">
+          <li>Read the post — one-liners that add value or ask a specific question work best.</li>
+          <li>Aim for empathy + small action (e.g., "Try X this week").</li>
+          <li>Never post a generic compliment; add a micro-insight.</li>
+          <li>Keep the comment 1–3 sentences. Use thread replies for longer value.</li>
+        </ul>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- Modal for editing comment -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h3 id="modal-title">Edit Comment</h3>
+      <div class="small" id="modal-context"></div>
+      <textarea id="comment-edit" rows="5" placeholder="Edit your comment here..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="comment-target" type="text" placeholder="Optional: post URL or @handle (for logging)"/>
+        <select id="comment-day" style="width:160px">
+          <!-- days filled by JS -->
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="copy-comment" class="copy">Copy Comment</button>
+        <button id="copy-log-comment" class="copy">Copy & Log Comment</button>
+        <button id="cancel" class="copy" style="background:#ef4444">Cancel</button>
+      </div>
+      <div style="margin-top:8px" class="small">After "Copy & Log" the comment is saved to your local Comment Log.</div>
+    </div>
+  </div>
+
+<script>
+/* ========= Data / Defaults ========= */
+const DEFAULT_DAYS = 60;
+
+// default basic and secondary search strings used daily (can be customized per day)
+const DAILY_DEFAULT = {
+  basic: {
+    broad: ["affiliate marketing","online business","marketing tips"],
+    overwhelm: ["overwhelmed with marketing","too many tools","content overwhelm"],
+    ai: ["ChatGPT prompts?","AI workflow help","ai content tools"],
+    warm: ["notifications","repeat engagers"],
+    new_creators: ["new creator affiliate marketing","just starting content creator"]
+  },
+  secondary: {
+    broad: ["digital marketing tips","email marketing","small business marketing"],
+    overwhelm: ["marketing burnout","too many strategies","decision fatigue"],
+    ai: ["ai for creators","ai prompts for writers","ai content workflow"],
+    warm: ["repeat likes","repeat replies","profile visitors"],
+    new_creators: ["first tweet thread help","starting out creators","new to creator economy"]
+  }
+};
+
+// comment templates (50+ short high-contact templates; you can edit or add)
+const COMMENT_TEMPLATES = [
+  "Love this — small tweak: try doing X for 7 days and see the result.",
+  "This is gold. One micro-action readers can try today: [insert tiny step].",
+  "Huge agree. I found that simplifying to one promise helped a ton.",
+  "Quick question: what outcome are you trying to get from this?",
+  "Nice example — did you try breaking that into 3 steps for clarity?",
+  "Saving this — will try the suggestion and report back.",
+  "This resonated. The one thing that changed for me was removing tool clutter.",
+  "Micro tip: write your promise in one sentence — use it as your headline.",
+  "I've seen similar — batching hooks for one hour fixed my week.",
+  "If someone is overwhelmed, the simplest first step is to remove one decision.",
+  "Short win: pick one platform and post 3x this week consistently.",
+  "Curious — which audience are you aiming this at?",
+  "Solid. If you want a 1-page checklist for this, DM 'Funnel' and I’ll share.",
+  "This is why systems beat ideas — thanks for sharing.",
+  "Love the honesty here. One tiny test: try this change for 5 posts.",
+  "This made me rethink my workflow — thanks!",
+  "Great thread — the example in step 2 is everything.",
+  "I used to do that too; switching to a 5-step system helped.",
+  "A small addition: try writing your main promise at the top of each post.",
+  "Bookmarking this — short, actionable, useful.",
+  "This is the kind of practical post people need more of.",
+  "That pain point is real. One way to start fixing it: [tiny action].",
+  "Agree — clarity first, everything else follows.",
+  "I like how you broke this down. Could you add a simple checklist?",
+  "This is great. I’ve been using a similar approach and it works.",
+  "Thanks for sharing — one quick experiment: do X for 7 days.",
+  "This resonates. How long did it take for you to see results?",
+  "Simple and useful — thanks for the clear steps.",
+  "If this is for beginners, add an 'Where to start' line.",
+  "Love the vulnerability in this post. Very relatable.",
+  "This is a neat framework — thanks for the breakdown.",
+  "Try calling this 'The 5-minute clarity test' — would make a nice hook.",
+  "Short actionable tip: write 3 hooks, pick 1, post tomorrow.",
+  "This is why removing choices matters — great post.",
+  "This made me pause — thanks for sharing that insight.",
+  "A tiny suggestion: swap step 2 and 3 for clarity.",
+  "This helps — what was the hardest part for you?",
+  "I’ve seen this fail when people overcomplicate — love the simplicity here.",
+  "Great. If you want a quick checklist, I sent one to folks who DM 'Funnel'.",
+  "Excellent — the example at 3:20 is everything.",
+  "This is so practical. Bookmarking and trying this out.",
+  "I’d love to hear how you’d simplify this for beginners.",
+  "Solid advice. One micro-test: try removing one tool and measure results.",
+  "Loved reading this — the mental model is clean and usable.",
+  "Practical and honest — thank you.",
+  "Short wins beat big plans here — amazing post.",
+  "Nice breakdown — would love a downloadable checklist.",
+  "This should be its own thread — great starter post."
+];
+
+/* ========= Utility & Storage ========= */
+const STORAGE_KEY = 'cocs_comment_log_v1';
+
+// create day entries (simple editable object store in localStorage too)
+function loadDays(){
+  const raw = localStorage.getItem('cocs_comment_days_v1');
+  if(!raw){
+    // create default 60 days
+    const days = Array.from({length:DEFAULT_DAYS}, (_,i) => {
+      return {
+        day: i+1,
+        targets: {broad:5,overwhelm:5,ai:3,warm:3,new:2},
+        basic: DAILY_DEFAULT.basic,
+        secondary: DAILY_DEFAULT.secondary,
+        notes: ''
+      };
+    });
+    localStorage.setItem('cocs_comment_days_v1', JSON.stringify(days));
+    return days;
+  }
+  try{ return JSON.parse(raw) } catch(e){ return [] }
+}
+function saveDays(days){ localStorage.setItem('cocs_comment_days_v1', JSON.stringify(days)); }
+
+// comment log functions
+function loadLog(){ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return []; try{return JSON.parse(raw)}catch(e){return []} }
+function saveLog(entry){ const arr = loadLog(); arr.unshift(entry); localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); renderLog(); }
+function clearLog(){ if(!confirm('Clear all comment logs?')) return; localStorage.removeItem(STORAGE_KEY); renderLog(); }
+
+/* ========= Rendering UI ========= */
+const daySelector = document.getElementById('day-selector');
+const dayContent = document.getElementById('day-content');
+const templatesArea = document.getElementById('templates-area');
+const commentDaySelect = document.getElementById('comment-day');
+
+let DAYS = loadDays();
+
+// populate day selector
+function populateDaySelector(){
+  daySelector.innerHTML = '';
+  DAYS.forEach(d => {
+    const opt = document.createElement('option'); opt.value = d.day; opt.innerText = 'Day ' + d.day;
+    daySelector.appendChild(opt);
+  });
+}
+populateDaySelector();
+
+// render day content
+function renderDay(dayNum){
+  const d = DAYS.find(x=>x.day==dayNum);
+  if(!d) return;
+  dayContent.innerHTML = `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <div class="day-num">Day ${d.day}</div>
+      <div style="flex:1">
+        <div class="small">Targets: Broad ${d.targets.broad} • Overwhelm ${d.targets.overwhelm} • AI ${d.targets.ai} • Warm ${d.targets.warm} • New ${d.targets.new}</div>
+        <div style="margin-top:6px"><input id="notes-input" type="text" placeholder="Optional: notes for today" value="${escapeHtml(d.notes||'')}" /></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="save-day" class="copy">Save Day</button>
+        <button id="reset-day" class="copy small" style="background:#ef4444">Reset</button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <h4 class="small">Basic Search Strings</h4>
+        <div class="list"><strong>Broad niche</strong><div>${renderSearchButtons(d.basic.broad)}</div></div>
+        <div class="list"><strong>Creators discussing overwhelm</strong><div>${renderSearchButtons(d.basic.overwhelm)}</div></div>
+        <div class="list"><strong>AI-curious creators</strong><div>${renderSearchButtons(d.basic.ai)}</div></div>
+        <div class="list"><strong>Warm notifications</strong><div>${renderSearchButtons(d.basic.warm)}</div></div>
+        <div class="list"><strong>New creators</strong><div>${renderSearchButtons(d.basic.new_creators||d.basic.new_creators)}</div></div>
+      </div>
+      <div>
+        <h4 class="small">Secondary Search Strings (fallbacks)</h4>
+        <div class="list"><strong>Broad niche</strong><div>${renderSearchButtons(d.secondary.broad)}</div></div>
+        <div class="list"><strong>Creators discussing overwhelm</strong><div>${renderSearchButtons(d.secondary.overwhelm)}</div></div>
+        <div class="list"><strong>AI-curious creators</strong><div>${renderSearchButtons(d.secondary.ai)}</div></div>
+        <div class="list"><strong>Warm notifications</strong><div>${renderSearchButtons(d.secondary.warm)}</div></div>
+        <div class="list"><strong>New creators</strong><div>${renderSearchButtons(d.secondary.new_creators||d.secondary.new_creators)}</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <h4 class="small">Who to comment on (quick filters)</h4>
+      <div class="list">
+        <div><strong>Priority 1:</strong> Recent posts (<24–72 hrs) with high engagement in your niche</div>
+        <div><strong>Priority 2:</strong> Posts by repeat engagers on your tweets</div>
+        <div><strong>Priority 3:</strong> New creators in niche — follow + comment</div>
+      </div>
+    </div>
+  `;
+
+  // attach listeners
+  document.getElementById('save-day').addEventListener('click', ()=>{
+    const notes = document.getElementById('notes-input').value;
+    d.notes = notes;
+    saveDays(DAYS);
+    alert('Saved');
+  });
+  document.getElementById('reset-day').addEventListener('click', ()=>{
+    if(!confirm('Reset this day to defaults?')) return;
+    const idx = DAYS.findIndex(x=>x.day==d.day);
+    if(idx>-1){
+      DAYS[idx].basic = DAILY_DEFAULT.basic;
+      DAYS[idx].secondary = DAILY_DEFAULT.secondary;
+      DAYS[idx].notes = '';
+      saveDays(DAYS);
+      renderDay(d.day);
+    }
+  });
+
+  // populate comment-day select in modal
+  commentDaySelect.innerHTML = '';
+  DAYS.forEach(dd => {
+    const opt = document.createElement('option'); opt.value = dd.day; opt.innerText = 'Day ' + dd.day;
+    commentDaySelect.appendChild(opt);
+  });
+}
+
+// helper to render buttons for search strings
+function renderSearchButtons(arr){
+  if(!arr || !arr.length) return '';
+  return arr.map(s => `<button class="ghost" data-copytext="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join(' ');
+}
+
+// initial render
+renderDay(1);
+daySelector.addEventListener('change', e => renderDay(e.target.value));
+
+// templates area
+function renderTemplates(){
+  templatesArea.innerHTML = '';
+  COMMENT_TEMPLATES.forEach((t,i)=>{
+    const div = document.createElement('div'); div.className='template';
+    div.innerHTML = `<div>${escapeHtml(t)}</div><div style="margin-top:8px"><button class="copy" data-template-index="${i}">Edit & Copy</button></div>`;
+    templatesArea.appendChild(div);
+  });
+}
+renderTemplates();
+
+/* ========= Modal / Editor logic ========= */
+const modal = document.getElementById('modal');
+const commentEdit = document.getElementById('comment-edit');
+const commentTarget = document.getElementById('comment-target');
+const commentDay = document.getElementById('comment-day');
+const modalContext = document.getElementById('modal-context');
+
+document.addEventListener('click', e=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+
+  // copy search string quick buttons
+  if(btn.hasAttribute('data-copytext')){
+    const text = btn.getAttribute('data-copytext');
+    copyToClipboard(text, btn);
+    return;
+  }
+
+  // edit & copy template
+  const tIndex = btn.getAttribute('data-template-index');
+  if(tIndex !== null && tIndex !== undefined){
+    openCommentEditor(COMMENT_TEMPLATES[tIndex], 'Template #' + (parseInt(tIndex)+1));
+    return;
+  }
+
+  // modal actions
+  if(btn.id === 'copy-comment'){
+    const text = commentEdit.value.trim();
+    if(!text) return alert('Comment is empty');
+    copyToClipboard(text, btn);
+    return;
+  }
+  if(btn.id === 'copy-log-comment'){
+    const text = commentEdit.value.trim();
+    if(!text) return alert('Comment is empty');
+    copyToClipboard(text, btn);
+    // log
+    const entry = {
+      id: 'c_' + Date.now(),
+      day: commentDay.value || '1',
+      target: (commentTarget.value || '').trim(),
+      text: text,
+      ts: new Date().toISOString()
+    };
+    saveLog(entry);
+    alert('Comment copied and logged.');
+    closeModal();
+    return;
+  }
+  if(btn.id === 'cancel'){
+    closeModal();
+    return;
+  }
+
+  // aside log buttons
+  if(btn.id === 'view-log'){ toggleLog(); return; }
+  if(btn.id === 'export-log'){ exportCSV(); return; }
+  if(btn.id === 'clear-log'){ clearLog(); return; }
+
+});
+
+// open modal with prefilled comment
+function openCommentEditor(prefill, context){
+  modalContext.innerText = context || '';
+  commentEdit.value = prefill || '';
+  commentTarget.value = document.getElementById('log-target').value || '';
+  commentDay.value = document.getElementById('day-selector').value || '1';
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden','false');
+  commentEdit.focus();
+}
+function closeModal(){ modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); }
+
+/* ========= Logging UI ========= */
+function renderLog(){
+  const area = document.getElementById('log-area');
+  const logs = loadLog();
+  if(!logs || !logs.length){ area.style.display = 'none'; area.innerHTML = ''; return; }
+  area.style.display = 'block';
+  let html = '<table><thead><tr><th>Time</th><th>Day</th><th>Target</th><th>Text (preview)</th></tr></thead><tbody>';
+  logs.forEach(l => {
+    html += `<tr><td>${new Date(l.ts).toLocaleString()}</td><td>Day ${escapeHtml(l.day)}</td><td>${escapeHtml(l.target||'')}</td><td>${escapeHtml(l.text.substring(0,120))}...</td></tr>`;
+  });
+  html += '</tbody></table>';
+  area.innerHTML = html;
+}
+renderLog();
+
+// toggle log visibility
+function toggleLog(){
+  const area = document.getElementById('log-area');
+  if(area.style.display === 'block'){ area.style.display = 'none'; return; }
+  renderLog(); area.style.display = 'block';
+}
+
+// export CSV of logs
+function exportCSV(){
+  const logs = loadLog();
+  if(!logs.length) return alert('No logs to export.');
+  const rows = [['time','day','target','text']];
+  logs.slice().reverse().forEach(l => {
+    rows.push([l.ts,l.day,l.target,(l.text||'').replace(/\n/g,' \\n ')]);
+  });
+  const csv = rows.map(r => r.map(c => `"${(''+c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'cocs_comment_log.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+/* ========= Helper functions ========= */
+function copyToClipboard(text, btn){
+  navigator.clipboard.writeText(text).then(()=>{ const orig = btn.innerText; btn.innerText = 'Copied'; setTimeout(()=>btn.innerText = orig,900); }).catch(()=>{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); const orig=btn.innerText; btn.innerText='Copied'; setTimeout(()=>btn.innerText=orig,900); });
+}
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* Initialize */
+(function init(){
+  // fill day selector value and render
+  daySelector.addEventListener('change', ()=> renderDay(daySelector.value));
+  renderDay(1);
+
+  // fill comment day select
+  for(let i=1;i<=DEFAULT_DAYS;i++){
+    const opt = document.createElement('option'); opt.value = i; opt.innerText = 'Day ' + i;
+    commentDaySelect.appendChild(opt);
+  }
+
+  // attach copy buttons in templates (delegated handling)
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('button[data-template-index]');
+    if(!btn) return;
+    const idx = parseInt(btn.getAttribute('data-template-index'));
+    openCommentEditor(COMMENT_TEMPLATES[idx], 'Template #' + (idx+1));
+  });
+
+  // Delegate ghost buttons for search copy
+  document.addEventListener('click', function(e){
+    const g = e.target.closest('button[data-copytext]');
+    if(!g) return;
+    const txt = g.getAttribute('data-copytext');
+    copyToClipboard(txt, g);
+  });
+
+  // allow saving day edits (notes) on change of notes input (already wired above)
+})();
+
+</script>
+</body>
+</html>
