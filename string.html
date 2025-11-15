@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Influencer Search Prompt Generator</title>
+  <link rel="icon" href="spm.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient-start: #1f2937;
+      --bg-gradient-end: #111827;
+      --card-bg: rgba(31, 41, 55, 0.5); /* Semi-transparent card background */
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-primary: #f9fafb;
+      --text-secondary: #d1d5db;
+      --text-heading: #ffffff;
+      --accent-primary: #22d3ee;
+      --accent-hover: #67e8f9;
+      --accent-success: #34d399;
+      --input-bg: #374151;
+      --code-bg: rgba(0, 0, 0, 0.3);
+      --shadow-color: rgba(0, 0, 0, 0.25);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 850px;
+      width: 100%;
+      margin: 0 auto;
+      flex-grow: 1;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+    }
+    p.subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+    .input-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px 0 var(--shadow-color);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 30px;
+        margin-bottom: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .input-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    label {
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    input[type="text"], input[type="date"] {
+        background-color: var(--input-bg);
+        border: 1px solid var(--card-border);
+        color: var(--text-primary);
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: 'Inter', sans-serif;
+        width: 100%;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.8);
+        cursor: pointer;
+    }
+    .generate-button {
+        padding: 12px 20px;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--bg-gradient-end);
+        background-color: var(--accent-primary);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        text-align: center;
+        margin-top: 10px;
+    }
+    .generate-button:hover {
+        background-color: var(--accent-hover);
+        transform: translateY(-2px);
+    }
+    .prompts-container {
+      display: grid;
+      gap: 30px;
+    }
+    .prompt-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px 0 var(--shadow-color);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px); /* For Safari */
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .prompt-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px 0 var(--shadow-color);
+    }
+    .prompt-card h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .prompt-text {
+      background-color: var(--code-bg);
+      padding: 20px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'Source Code Pro', "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 1rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      flex-grow: 1;
+      margin-bottom: 20px;
+      border: 1px solid var(--card-border);
+    }
+    .copy-button {
+      align-self: flex-end;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--bg-gradient-end);
+      background-color: var(--accent-primary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .copy-button:hover {
+      background-color: var(--accent-hover);
+      transform: scale(1.05);
+    }
+    .copy-button.copied {
+      background-color: var(--accent-success);
+    }
+    .copy-button .icon {
+      width: 16px;
+      height: 16px;
+    }
+    .copy-button .copied-icon {
+        display: none;
+    }
+    .copy-button.copied .copy-icon {
+        display: none;
+    }
+    .copy-button.copied .copied-icon {
+        display: inline-block;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 15px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .input-row {
+          grid-template-columns: 1fr;
+      }
+      .prompt-card h2 {
+        font-size: 1.4rem;
+      }
+      .prompt-text {
+          font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Influencer Search Prompt Generator</h1>
+      <p class="subtitle">Enter a keyword and date to generate ready-to-use search commands for X (Twitter).</p>
+    </header>
+
+    <main>
+        <div class="input-card">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="searchPhrase">Search Phrase</label>
+                    <input type="text" id="searchPhrase" placeholder="e.g., Affiliate Marketing">
+                </div>
+                <div class="input-group">
+                    <label for="searchDate">Since Date</label>
+                    <input type="date" id="searchDate">
+                </div>
+            </div>
+            <button id="generateBtn" class="generate-button">Generate Prompts</button>
+        </div>
+
+        <div class="prompts-container" id="promptsContainer">
+            <!-- Generated prompt card will appear here -->
+        </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const generateBtn = document.getElementById('generateBtn');
+        const promptsContainer = document.getElementById('promptsContainer');
+        const searchPhraseInput = document.getElementById('searchPhrase');
+        const searchDateInput = document.getElementById('searchDate');
+
+        // Set default date to a week ago for better initial results
+        const aWeekAgo = new Date();
+        aWeekAgo.setDate(aWeekAgo.getDate() - 7);
+        const yyyy = aWeekAgo.getFullYear();
+        const mm = String(aWeekAgo.getMonth() + 1).padStart(2, '0');
+        const dd = String(aWeekAgo.getDate()).padStart(2, '0');
+        searchDateInput.value = `${yyyy}-${mm}-${dd}`;
+
+        generateBtn.addEventListener('click', () => {
+            const searchPhrase = searchPhraseInput.value.trim();
+            const searchDate = searchDateInput.value;
+
+            if (!searchPhrase || !searchDate) {
+                alert('Please fill in both the Search Phrase and the Date.');
+                return;
+            }
+            
+            const promptTextContent = `Page Title: ${searchPhrase} Influencer খুঁজে পাওয়ার জন্য Ready Search Commands
+Note: শুধু কপি করে X (Twitter) এর সার্চ বারে পেস্ট করবে।
+
+
+Prompt1) Verified (Blue Tick) ${searchPhrase} Experts
+
+
+${searchPhrase} filter:verified
+
+
+Prompt2) Bio-তে “${searchPhrase}” লেখা creators
+
+
+bio:"${searchPhrase}"
+
+
+Prompt3) ${searchPhrase} experts যারা coach/mentor
+
+
+${searchPhrase} coach
+${searchPhrase} mentor
+
+
+Prompt4) Highly Active Creators: Likes 30+
+
+
+"${searchPhrase}" min_faves:30
+
+
+Prompt5) High Engagement Influencers (retweets 10+)
+
+
+"${searchPhrase}" min_retweets:10
+
+
+Prompt6) Top Posts This Month (Recent Only)
+
+(আজ নভেম্বর ধরে উদাহরণ দিলাম — তুমি মাস অনুযায়ী বদলাতে পারবে)
+
+
+"${searchPhrase}" since:${searchDate}
+
+
+Prompt7) Beginner-friendly content creators
+
+
+${searchPhrase} tips
+${searchPhrase} for beginners
+
+
+Prompt8) Ads + Affiliate Combo Experts
+
+(যারা ads নিয়ে affiliate শেখায়—এরা খুব active creators)
+
+${searchPhrase} "facebook ads"
+${searchPhrase} "google ads"
+
+
+Prompt9) Offers, CPA, Network Based Experts
+
+
+${searchPhrase} "ClickBank"
+${searchPhrase} "WarriorPlus"
+${searchPhrase} "CPA marketing"
+${searchPhrase} "Digistore24"
+
+
+Prompt10) Influencers who teach content strategy for affiliate
+
+
+${searchPhrase} "content strategy"
+${searchPhrase} "seo"
+${searchPhrase} "email marketing"
+
+
+Prompt11) Influencers using #hashtags
+
+(এগুলো সার্চ করলে তাদের সব recent পোস্ট + influencer list উঠবে)
+
+#affiliatemarketing
+#affiliateprogram
+#digitalmarketing
+#makemoneyonline
+#moneymaking
+
+➡ এরপর Top ট্যাব = influencers
+➡ Latest ট্যাব = active creators
+
+12) Influencers who tweet threads
+
+(Thread writers সাধারণত অনেক ফলোয়ার বাড়ায়)
+
+${searchPhrase} (thread OR 🧵)
+
+
+Prompt13) Influencers targeting beginners
+
+${searchPhrase} beginner tips
+${searchPhrase} step by step
+
+
+Prompt-Bonus: সবচেয়ে Powerful Search (সবচেয়ে ভাল influencers দেখাবে)
+
+"${searchPhrase}" min_faves:50 min_replies:5 min_retweets:5
+
+এটা দিলে *high-engagement influencers* দেখাবে, যারা ১০০% অ্যাকটিভ।`;
+
+            promptsContainer.innerHTML = ''; // Clear previous results
+
+            const card = document.createElement('div');
+            card.className = 'prompt-card';
+
+            const h2 = document.createElement('h2');
+            h2.textContent = 'Generated Search Prompts';
+
+            const pre = document.createElement('pre');
+            pre.id = 'generatedPrompt';
+            pre.className = 'prompt-text';
+            pre.textContent = promptTextContent;
+
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.dataset.target = 'generatedPrompt';
+            button.innerHTML = `
+                <svg class="icon copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+                <svg class="icon copied-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                <span class="button-text">Copy All Prompts</span>
+            `;
+
+            card.appendChild(h2);
+            card.appendChild(pre);
+            card.appendChild(button);
+            
+            promptsContainer.appendChild(card);
+        });
+
+        // Event delegation for the copy button
+        promptsContainer.addEventListener('click', (event) => {
+            const button = event.target.closest('.copy-button');
+            if (!button) return;
+
+            const targetId = button.dataset.target;
+            const textToCopy = document.getElementById(targetId).textContent;
+            const buttonTextEl = button.querySelector('.button-text');
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+            const originalText = buttonTextEl.textContent;
+            buttonTextEl.textContent = 'Copied!';
+            button.classList.add('copied');
+            
+            setTimeout(() => {
+                buttonTextEl.textContent = originalText;
+                button.classList.remove('copied');
+            }, 2000);
+            }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert('Failed to copy text. Please try again.');
+            });
+        });
+    });
+  </script>
+
+  <footer class="footer">
+      <div style="padding-top: 30px;">&nbsp;</div>
+      <center><p>Copyright &copy; <script>document.write(new Date().getFullYear())</script> Siva Prasad Mukherjee. All Rights Reserved.</p></center>
+  </footer>
+
+</body>
+</html>
