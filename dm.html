@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Advanced Tweet Prompt Generator</title>
+  <link rel="icon" href="spm.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient-start: #1f2937;
+      --bg-gradient-end: #111827;
+      --card-bg: rgba(31, 41, 55, 0.5); /* Semi-transparent card background */
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-primary: #f9fafb;
+      --text-secondary: #d1d5db;
+      --text-heading: #ffffff;
+      --accent-primary: #22d3ee;
+      --accent-hover: #67e8f9;
+      --accent-success: #34d399;
+      --input-bg: #374151;
+      --code-bg: rgba(0, 0, 0, 0.3);
+      --shadow-color: rgba(0, 0, 0, 0.25);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 850px;
+      width: 100%;
+      margin: 0 auto;
+      flex-grow: 1;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+    }
+    p.subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+    .input-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px 0 var(--shadow-color);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 30px;
+        margin-bottom: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    label {
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    textarea {
+        background-color: var(--input-bg);
+        border: 1px solid var(--card-border);
+        color: var(--text-primary);
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: 'Inter', sans-serif;
+        width: 100%;
+        min-height: 120px;
+        resize: vertical;
+    }
+    .generate-button {
+        padding: 12px 20px;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--bg-gradient-end);
+        background-color: var(--accent-primary);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        text-align: center;
+        margin-top: 10px;
+    }
+    .generate-button:hover {
+        background-color: var(--accent-hover);
+        transform: translateY(-2px);
+    }
+    .prompts-container {
+      display: grid;
+      gap: 30px;
+    }
+    .prompt-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px 0 var(--shadow-color);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px); /* For Safari */
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .prompt-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px 0 var(--shadow-color);
+    }
+    .prompt-card h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .prompt-text {
+      background-color: var(--code-bg);
+      padding: 20px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'Source Code Pro', "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 1rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      flex-grow: 1;
+      margin-bottom: 20px;
+      border: 1px solid var(--card-border);
+    }
+    .copy-button {
+      align-self: flex-end;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--bg-gradient-end);
+      background-color: var(--accent-primary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .copy-button:hover {
+      background-color: var(--accent-hover);
+      transform: scale(1.05);
+    }
+    .copy-button.copied {
+      background-color: var(--accent-success);
+    }
+    .copy-button .icon {
+      width: 16px;
+      height: 16px;
+    }
+    .copy-button .copied-icon {
+        display: none;
+    }
+    .copy-button.copied .copy-icon {
+        display: none;
+    }
+    .copy-button.copied .copied-icon {
+        display: inline-block;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 15px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .prompt-card h2 {
+        font-size: 1.4rem;
+      }
+      .prompt-text {
+          font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Advanced Tweet Prompt Generator</h1>
+      <p class="subtitle">Paste a tweet to generate analysis prompts for commenting and DM outreach.</p>
+    </header>
+
+    <main>
+        <div class="input-card">
+            <div class="input-group">
+                <label for="tweetTextInput">PASTE TWEET TEXT HERE</label>
+                <textarea id="tweetTextInput" placeholder="e.g., I'm so overwhelmed with creating content. I need a simpler way to generate leads without burning out. Anyone have a system that works?"></textarea>
+            </div>
+            <button id="generateBtn" class="generate-button">Generate Prompts</button>
+        </div>
+
+        <div class="prompts-container" id="promptsContainer">
+            <!-- Generated prompt cards will appear here -->
+        </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const generateBtn = document.getElementById('generateBtn');
+        const promptsContainer = document.getElementById('promptsContainer');
+        const tweetTextInput = document.getElementById('tweetTextInput');
+
+        const createPromptCard = (title, promptId, promptContent) => {
+            const card = document.createElement('div');
+            card.className = 'prompt-card';
+
+            const h2 = document.createElement('h2');
+            h2.textContent = title;
+
+            const pre = document.createElement('pre');
+            pre.id = promptId;
+            pre.className = 'prompt-text';
+            pre.textContent = promptContent;
+
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.dataset.target = promptId;
+            button.innerHTML = `
+                <svg class="icon copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+                <svg class="icon copied-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                <span class="button-text">Copy Prompt</span>
+            `;
+
+            card.appendChild(h2);
+            card.appendChild(pre);
+            card.appendChild(button);
+            
+            return card;
+        };
+
+        generateBtn.addEventListener('click', () => {
+            const tweetText = tweetTextInput.value.trim();
+
+            if (!tweetText) {
+                alert('Please paste the tweet text into the box.');
+                return;
+            }
+            
+            // --- Prompt 1: Comment Generation ---
+            const commentPromptContent = `Analyze the tweet below and follow all steps exactly. Do NOT restate the instructions.
+
+Tweet:
+${tweetText}
+
+STEP 1 — Classify the Tweet (choose ONE)
+Classify this tweet as one of the following:
+Value
+Story
+Opinion
+Question
+Win
+
+Respond with:
+Category: ___
+
+STEP 2 — Explain WHY
+In 1–2 short sentences, explain why you classified it that way.
+
+STEP 3 — Generate the Most Effective Comment
+Write one highly effective, human, non-salesy comment that:
+
+- matches the tweet category
+- matches the creator’s tone
+- builds relationship
+- increases profile clicks
+- contains no CTA
+- contains no selling
+- is 1–2 sentences max
+
+Use the correct style:
+Value tweet → add-on insight
+Story tweet → empathy + micro-takeaway
+Opinion tweet → soft nuance or supportive angle
+Question tweet → honest answer + micro-story
+Win tweet → congratulations + thoughtful observation
+
+STEP 4 — Optional Follow-Up Reply
+Write one very short optional second reply I could post under my own comment to deepen the interaction.
+(Examples: clarifying question, micro-insight, relatable statement)
+
+Output format (use exactly this):
+
+Category:
+[type]
+
+Reasoning:
+[1–2 sentences]
+
+Best Comment:
+[text]
+
+Optional Follow-Up Reply:
+[text]`;
+
+            // --- Prompt 2: DM Trigger Detector ---
+            const dmPromptContent = `Analyze the tweet below and act as a DM Trigger Detector. Do NOT restate these instructions.
+
+Tweet:
+${tweetText}
+
+Tasks (follow exactly):
+
+1. Scan the tweet for any DM triggers and list them. Possible triggers include:
+- explicit ask for a resource or help (“anyone have X?”, “how do I…?”)
+- direct request for DM (“DM me”, “send me”, “link please”)
+- clear pain statement (“I’m overwhelmed”, “I can’t get traffic”)
+- repeated engagement signals (bookmarking, following, repeat replies)
+- clear buying intent (“want to build a funnel”, “need a lead magnet now”)
+- openness (“would love that”, “please send help”)
+- curiosity + tool request (“best AI tool for X?”)
+- anything indicating intent or readiness
+
+2. For each trigger, assign:
+- Signal Strength: High / Medium / Low
+- Confidence Score (0–100)
+
+3. Recommended Action (choose ONE):
+- DM Now
+- Wait & Watch
+- No DM
+
+4. If action = DM Now or Wait & Watch, provide:
+- Recommended DM Type (Warm Opener / Deep-Pain Question / Permission Offer / Value Drop / Follow-up)
+- Suggested Timing
+- Suggested DM Script (1–3 short, human sentences; no selling)
+- Follow-Up Plan (what to do if they reply or don’t reply)
+
+5. Extract 5–10 keywords/phrases from the tweet that indicate intent/pain.
+
+6. Explain WHY (1–2 sentences).
+
+7. Safety/Spam Check:
+- Is DM appropriate? Yes/No
+- List any red flags
+
+8. Confidence Summary (0–100)
+
+Output Format (copy/paste exactly):
+
+DM Trigger Detector Output
+————————————
+Tweet (verbatim):
+[original tweet text]
+
+1) Detected Triggers:
+- [Trigger 1] — Signal Strength: [High/Medium/Low], Confidence: [0–100]
+- [Trigger 2] — Signal Strength: [High/Medium/Low], Confidence: [0–100]
+
+2) Recommended Action:
+[DM Now / Wait & Watch / No DM]
+
+3) If DM Now / Wait & Watch — DM Plan:
+- Recommended DM Type: [type]
+- Suggested Timing: [time]
+- Suggested DM Script:
+"[script]"
+- Follow-up Plan:
+"[plan]"
+
+4) Keywords & Phrases (intent/pain signals):
+- [list]
+
+5) Why:
+[reason]
+
+6) Safety / Spam Check:
+- DM appropriate? [Yes/No]
+- Red flags: [list]
+
+7) Confidence Summary:
+[0–100]
+
+End.`;
+
+            promptsContainer.innerHTML = ''; // Clear previous results
+            
+            const commentCard = createPromptCard('Comment Generation Prompt', 'generatedCommentPrompt', commentPromptContent);
+            const dmCard = createPromptCard('DM Trigger Detector Prompt', 'generatedDmPrompt', dmPromptContent);
+
+            promptsContainer.appendChild(commentCard);
+            promptsContainer.appendChild(dmCard);
+
+            commentCard.scrollIntoView({ behavior: 'smooth' }); // Scroll to the first new card
+        });
+
+        // Event delegation for the copy button
+        promptsContainer.addEventListener('click', (event) => {
+            const button = event.target.closest('.copy-button');
+            if (!button) return;
+
+            const targetId = button.dataset.target;
+            const textToCopy = document.getElementById(targetId).textContent;
+            const buttonTextEl = button.querySelector('.button-text');
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = buttonTextEl.textContent;
+                buttonTextEl.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    buttonTextEl.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy text. Please try again.');
+            });
+        });
+    });
+  </script>
+
+  <footer class="footer">
+      <div style="padding-top: 30px;">&nbsp;</div>
+      <center><p>Copyright &copy; <script>document.write(new Date().getFullYear())</script> Siva Prasad Mukherjee. All Rights Reserved.</p></center>
+  </footer>
+
+</body>
+</html>
